@@ -18,4 +18,4 @@ COPY package.json ./
 
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx drizzle-kit migrate && npm start"]
+CMD ["npm", "start"]
