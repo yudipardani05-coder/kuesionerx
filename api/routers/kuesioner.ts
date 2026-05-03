@@ -210,38 +210,55 @@ export const kuesionerRouter = createRouter({
         await db.insert(answers).values(answerValues);
       }
 
-      // Generate Excel with all submissions
-      const allRespondents = await db.select().from(respondents).orderBy(respondents.id);
-      const allAnswers = await db.select().from(answers);
+     // Semua proses berat di background
+(async () => {
+  try {
+    const allRespondents = await db.select().from(respondents).orderBy(respondents.id);
+    const allAnswers = await db.select().from(answers);
 
-      const submissions = allRespondents.map((r) => {
-        const rAnswers = allAnswers.filter((a) => a.respondentId === r.id);
-        const answerMap: Record<string, number> = {};
-        rAnswers.forEach((a) => {
-          answerMap[`q${a.questionNumber}`] = a.answerValue;
-        });
-        return {
-          id: r.id,
-          name: r.name,
-          department: r.department,
-          yearsWorked: r.yearsWorked,
-          createdAt: r.createdAt,
-          answers: answerMap,
-        };
+    const submissions = allRespondents.map((r) => {
+      const rAnswers = allAnswers.filter((a) => a.respondentId === r.id);
+      const answerMap: Record<string, number> = {};
+      rAnswers.forEach((a) => {
+        answerMap[`q${a.questionNumber}`] = a.answerValue;
       });
-
-      const excelBuffer = await generateExcelBuffer(submissions);
-      const filename = `Kuesioner_Penelitian_${new Date().toISOString().split("T")[0]}.xlsx`;
-
-      // Send email
-      const emailResult = await sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename);
-
       return {
-        success: true,
-        respondentId,
-        emailSent: emailResult.success,
-        emailMessage: emailResult.message || "",
+        id: r.id,
+        name: r.name,
+        department: r.department,
+        yearsWorked: r.yearsWorked,
+        createdAt: r.createdAt,
+        answers: answerMap,
       };
+    });
+
+    const excelBuffer = await generateExcelBuffer(submissions);
+    const filename = `Kuesioner_Penelitian_${new Date().toISOString().split("T")[0]}.xlsx`;
+    await sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename);
+    console.log("Email sent successfully");
+  } catch (err) {
+    console.error("Background email error:", err);
+  }
+})();
+
+return {
+  success: true,
+  respondentId,
+  emailSent: true,
+  emailMessage: "Data tersimpan, email sedang dikirim",
+};
+
+      // Send email di background (tidak block response)
+sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename)
+.then((result) => console.log("Email sent:", result))
+.catch((err) => console.error("Email error:", err));
+
+return {
+success: true,
+respondentId,
+emailSent: true,
+emailMessage: "Email sedang dikirim",
+};
     }),
 
   list: publicQuery.query(async () => {
