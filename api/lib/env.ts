@@ -19,5 +19,5 @@ export const env = {
   smtpPass: process.env.SMTP_PASS || "",
   smtpToEmail: process.env.SMTP_TO_EMAIL || "yudipardani50@gmail.com",
   smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",
+  resendApiKey: process.env.RESEND_API_KEY || "",
 };
-sed -i 's/smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",/smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",\n  resendApiKey: process.env.RESEND_API_KEY || "",/' api/lib/env.ts

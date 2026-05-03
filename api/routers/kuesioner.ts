@@ -70,33 +70,37 @@ const submitSchema = z.object({
   answers: z.record(z.string(), z.number().min(1).max(5)),
 });
 
-async function generateExcelBuffer(submissions: Array<{
-  id: number;
-  name: string;
-  department: string;
-  yearsWorked: string;
-  createdAt: Date;
-  answers: Record<string, number>;
-}>) {
+async function generateExcelBuffer(
+  submissions: Array<{
+    id: number;
+    name: string;
+    department: string;
+    yearsWorked: string;
+    createdAt: Date;
+    answers: Record<string, number>;
+  }>
+) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Data Kuesioner");
 
-  // Define headers
-  const headers = ["No", "Nama", "Bagian", "Lama Bekerja", ...Array.from({ length: 48 }, (_, i) => `Q${i + 1}`)];
+  const headers = [
+    "No",
+    "Nama",
+    "Bagian",
+    "Lama Bekerja",
+    ...Array.from({ length: 48 }, (_, i) => `Q${i + 1}`),
+  ];
 
-  // Add header row with styling
   worksheet.addRow(headers);
   const headerRow = worksheet.getRow(1);
-  headerRow.font = { bold: true, size: 11 };
+  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
   headerRow.fill = {
     type: "pattern",
     pattern: "solid",
     fgColor: { argb: "FF4472C4" },
   };
   headerRow.alignment = { horizontal: "center", vertical: "middle" };
-  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
 
-  // Add data rows
   submissions.forEach((sub, idx) => {
     const rowData = [
       idx + 1,
@@ -111,22 +115,14 @@ async function generateExcelBuffer(submissions: Array<{
     row.getCell(3).alignment = { horizontal: "left", vertical: "middle" };
   });
 
-  // Auto width for all columns
   worksheet.columns.forEach((col, idx) => {
-    if (idx === 0) {
-      col.width = 6;
-    } else if (idx === 1) {
-      col.width = 30;
-    } else if (idx === 2) {
-      col.width = 20;
-    } else if (idx === 3) {
-      col.width = 15;
-    } else {
-      col.width = 6;
-    }
+    if (idx === 0) col.width = 6;
+    else if (idx === 1) col.width = 30;
+    else if (idx === 2) col.width = 20;
+    else if (idx === 3) col.width = 15;
+    else col.width = 6;
   });
 
-  // Add borders to all cells
   for (let row = 1; row <= submissions.length + 1; row++) {
     for (let col = 1; col <= headers.length; col++) {
       const cell = worksheet.getCell(row, col);
@@ -139,44 +135,38 @@ async function generateExcelBuffer(submissions: Array<{
     }
   }
 
-  // Freeze header row
   worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
   return await workbook.xlsx.writeBuffer();
 }
 
 async function sendEmailWithAttachment(buffer: ArrayBuffer, filename: string) {
-  if (!env.smtpUser || !env.smtpPass) {
-    console.warn("SMTP credentials not configured, skipping email");
-    return { success: false, message: "SMTP not configured" };
+  if (!env.resendApiKey) {
+    console.warn("Resend API key not configured, skipping email");
+    return { success: false, message: "Resend not configured" };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: env.smtpHost,
-    port: env.smtpPort,
-    secure: env.smtpPort === 465,
-    auth: {
-      user: env.smtpUser,
-      pass: env.smtpPass,
-    },
-  });
+  const resend = new Resend(env.resendApiKey);
 
-  const info = await transporter.sendMail({
-    from: `"Kuesioner Penelitian" <${env.smtpFromEmail}>`,
+  const { error } = await resend.emails.send({
+    from: "Kuesioner Penelitian <onboarding@resend.dev>",
     to: env.smtpToEmail,
     subject: "Hasil Kuesioner Penelitian",
-    text: "Terlampir hasil kuesioner terbaru",
-    html: `<p>Terlampir hasil kuesioner terbaru</p><p>Total responden: ${new Date().toLocaleString("id-ID")}</p>`,
+    html: `<p>Terlampir hasil kuesioner terbaru.</p><p>Dikirim: ${new Date().toLocaleString("id-ID")}</p>`,
     attachments: [
       {
         filename,
         content: Buffer.from(buffer as ArrayBufferLike),
-        contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       },
     ],
   });
 
-  return { success: true, messageId: info.messageId };
+  if (error) {
+    console.error("Resend error:", error);
+    return { success: false, message: error.message };
+  }
+
+  return { success: true };
 }
 
 export const kuesionerRouter = createRouter({
@@ -210,77 +200,54 @@ export const kuesionerRouter = createRouter({
         await db.insert(answers).values(answerValues);
       }
 
-     // Semua proses berat di background
-(async () => {
-  try {
-    const allRespondents = await db.select().from(respondents).orderBy(respondents.id);
-    const allAnswers = await db.select().from(answers);
+      // Generate Excel + kirim email di background (tidak block response)
+      (async () => {
+        try {
+          const allRespondents = await db
+            .select()
+            .from(respondents)
+            .orderBy(respondents.id);
+          const allAnswers = await db.select().from(answers);
 
-    const submissions = allRespondents.map((r) => {
-      const rAnswers = allAnswers.filter((a) => a.respondentId === r.id);
-      const answerMap: Record<string, number> = {};
-      rAnswers.forEach((a) => {
-        answerMap[`q${a.questionNumber}`] = a.answerValue;
-      });
-      return {
-        id: r.id,
-        name: r.name,
-        department: r.department,
-        yearsWorked: r.yearsWorked,
-        createdAt: r.createdAt,
-        answers: answerMap,
-      };
-    });
+          const submissions = allRespondents.map((r) => {
+            const rAnswers = allAnswers.filter((a) => a.respondentId === r.id);
+            const answerMap: Record<string, number> = {};
+            rAnswers.forEach((a) => {
+              answerMap[`q${a.questionNumber}`] = a.answerValue;
+            });
+            return {
+              id: r.id,
+              name: r.name,
+              department: r.department,
+              yearsWorked: r.yearsWorked,
+              createdAt: r.createdAt,
+              answers: answerMap,
+            };
+          });
 
-    const excelBuffer = await generateExcelBuffer(submissions);
-    const filename = `Kuesioner_Penelitian_${new Date().toISOString().split("T")[0]}.xlsx`;
-    await sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename);
-    console.log("Email sent successfully");
-  } catch (err) {
-    console.error("Background email error:", err);
-  }
-})();
-
-return {
-  success: true,
-  respondentId,
-  emailSent: true,
-  emailMessage: "Data tersimpan, email sedang dikirim",
-};
-
-      // Send email di background (tidak block response)
-      async function sendEmailWithAttachment(buffer: ArrayBuffer, filename: string) {
-        const resend = new Resend(env.resendApiKey);
-        
-        const { error } = await resend.emails.send({
-          from: "Kuesioner Penelitian <onboarding@resend.dev>",
-          to: env.smtpToEmail,
-          subject: "Hasil Kuesioner Penelitian",
-          html: `<p>Terlampir hasil kuesioner terbaru</p>`,
-          attachments: [
-            {
-              filename,
-              content: Buffer.from(buffer as ArrayBufferLike),
-            },
-          ],
-        });
-      
-        if (error) {
-          console.error("Resend error:", error);
-          return { success: false, message: error.message };
+          const excelBuffer = await generateExcelBuffer(submissions);
+          const filename = `Kuesioner_Penelitian_${new Date().toISOString().split("T")[0]}.xlsx`;
+          const result = await sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename);
+          console.log("Email result:", result);
+        } catch (err) {
+          console.error("Background email error:", err);
         }
-      
-        return { success: true };
-      }
-respondentId,
-emailSent: true,
-emailMessage: "Email sedang dikirim",
-};
+      })();
+
+      return {
+        success: true,
+        respondentId,
+        emailSent: true,
+        emailMessage: "Data tersimpan, email sedang dikirim",
+      };
     }),
 
   list: publicQuery.query(async () => {
     const db = getDb();
-    const allRespondents = await db.select().from(respondents).orderBy(respondents.id);
+    const allRespondents = await db
+      .select()
+      .from(respondents)
+      .orderBy(respondents.id);
     const allAnswers = await db.select().from(answers);
 
     return allRespondents.map((r) => {
@@ -302,7 +269,10 @@ emailMessage: "Email sedang dikirim",
 
   export: publicQuery.query(async () => {
     const db = getDb();
-    const allRespondents = await db.select().from(respondents).orderBy(respondents.id);
+    const allRespondents = await db
+      .select()
+      .from(respondents)
+      .orderBy(respondents.id);
     const allAnswers = await db.select().from(answers);
 
     const submissions = allRespondents.map((r) => {
