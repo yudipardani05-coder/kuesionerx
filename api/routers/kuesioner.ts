@@ -3,7 +3,7 @@ import { createRouter, publicQuery } from "../middleware";
 import { getDb } from "../queries/connection";
 import { respondents, answers } from "@db/schema";
 import ExcelJS from "exceljs";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { env } from "../lib/env";
 
 // Question definitions with dimensions
@@ -249,12 +249,29 @@ return {
 };
 
       // Send email di background (tidak block response)
-sendEmailWithAttachment(excelBuffer as ArrayBuffer, filename)
-.then((result) => console.log("Email sent:", result))
-.catch((err) => console.error("Email error:", err));
-
-return {
-success: true,
+      async function sendEmailWithAttachment(buffer: ArrayBuffer, filename: string) {
+        const resend = new Resend(env.resendApiKey);
+        
+        const { error } = await resend.emails.send({
+          from: "Kuesioner Penelitian <onboarding@resend.dev>",
+          to: env.smtpToEmail,
+          subject: "Hasil Kuesioner Penelitian",
+          html: `<p>Terlampir hasil kuesioner terbaru</p>`,
+          attachments: [
+            {
+              filename,
+              content: Buffer.from(buffer as ArrayBufferLike),
+            },
+          ],
+        });
+      
+        if (error) {
+          console.error("Resend error:", error);
+          return { success: false, message: error.message };
+        }
+      
+        return { success: true };
+      }
 respondentId,
 emailSent: true,
 emailMessage: "Email sedang dikirim",
