@@ -15,6 +15,8 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/db ./db
 COPY --from=build /app/drizzle.config.ts ./
 COPY package.json ./
+COPY start.sh ./
+RUN chmod +x start.sh
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["sh", "start.sh"]
