@@ -20,3 +20,4 @@ export const env = {
   smtpToEmail: process.env.SMTP_TO_EMAIL || "yudipardani50@gmail.com",
   smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",
 };
+sed -i 's/smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",/smtpFromEmail: process.env.SMTP_FROM_EMAIL || "yudipardani50@gmail.com",\n  resendApiKey: process.env.RESEND_API_KEY || "",/' api/lib/env.ts
