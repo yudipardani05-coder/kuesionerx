@@ -193,11 +193,20 @@ export function QuestionnaireForm() {
             <ClipboardList className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Kuesioner Penelitian
+          KUESIONER PENELITIAN
+PENGARUH SISTEM PENGGAJIAN DAN PENGENDALIAN INTERNAL
+TERHADAP PERSPEKTIF AKUNTANSI MANAJEMEN
+(Studi Pada Pekerja Outsourcing di PT Geo Dipa Energi Unit Patuha 1 Bandung)
+
           </h1>
           <p className="text-slate-600 max-w-xl mx-auto">
-            Mohon isi kuesioner ini sesuai dengan pengalaman dan persepsi Anda. 
-            Jawaban Anda sangat berharga untuk penelitian ini.
+          1. Kuesioner ini bertujuan untuk mengumpulkan data penelitian.
+2. Isilah data diri Anda dengan lengkap dan benar.
+3. Jawablah setiap pernyataan sesuai pengalaman dan persepsi Anda.
+4. Tidak ada jawaban benar atau salah.
+5. Kerahasiaan jawaban Anda dijamin.
+6. Keterangan skala penilaian:
+
           </p>
         </div>
 
