@@ -122,7 +122,7 @@ export function QuestionnaireForm() {
     if (validateSection(currentSection)) {
       if (currentSection < sections.length - 1) {
         setCurrentSection((prev) => prev + 1);
-        sectionRefs.current[currentSection + 1]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } else {
       toast.error("Mohon lengkapi semua field yang wajib diisi");
