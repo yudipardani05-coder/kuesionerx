@@ -192,24 +192,23 @@ export function QuestionnaireForm() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-200 mb-4">
             <ClipboardList className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
-          KUESIONER PENELITIAN
-
-          
-PENGARUH SISTEM PENGGAJIAN DAN PENGENDALIAN INTERNAL
-TERHADAP PERSPEKTIF AKUNTANSI MANAJEMEN
-(Studi Pada Pekerja Outsourcing di PT Geo Dipa Energi Unit Patuha 1 Bandung)
-
-          </h1>
-          <p className="text-slate-600 max-w-xl mx-auto">
-          1. Kuesioner ini bertujuan untuk mengumpulkan data penelitian.
-          2. Isilah data diri Anda dengan lengkap dan benar.
-          3. Jawablah setiap pernyataan sesuai pengalaman dan persepsi Anda.
-          4. Tidak ada jawaban benar atau salah.
-          5. Kerahasiaan jawaban Anda dijamin.
-          6. Keterangan skala penilaian:
-
-          </p>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">
+  KUESIONER PENELITIAN
+</h1>
+<h2 className="text-lg font-bold text-slate-800 mb-6 max-w-2xl mx-auto leading-relaxed">
+  PENGARUH SISTEM PENGGAJIAN DAN PENGENDALIAN INTERNAL
+  TERHADAP PERSPEKTIF AKUNTANSI MANAJEMEN
+  <br />
+  <span className="font-semibold">(Studi Pada Pekerja Outsourcing di PT Geo Dipa Energi Unit Patuha 1 Bandung)</span>
+</h2>
+<ol className="text-slate-600 max-w-xl mx-auto text-left list-decimal list-inside space-y-1 mb-4">
+  <li>Kuesioner ini bertujuan untuk mengumpulkan data penelitian.</li>
+  <li>Isilah data diri Anda dengan lengkap dan benar.</li>
+  <li>Jawablah setiap pernyataan sesuai pengalaman dan persepsi Anda.</li>
+  <li>Tidak ada jawaban benar atau salah.</li>
+  <li>Kerahasiaan jawaban Anda dijamin.</li>
+  <li>Keterangan skala penilaian:</li>
+</ol>
         </div>
 
         {/* Scale Legend */}
