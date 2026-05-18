@@ -80,7 +80,11 @@ async function generateExcelBuffer(
     "Nama",
     "Bagian",
     "Lama Bekerja",
-    ...Array.from({ length: 48 }, (_, i) => `Q${i + 1}`),
+    ....Array.from({ length: 40 }, (_, i) => {
+      if (i < 15) return SP${i + 1};
+      if (i < 30) return PI${i + 16};
+      return KK${i + 31};
+    })
   ];
 
   worksheet.addRow(headers);
