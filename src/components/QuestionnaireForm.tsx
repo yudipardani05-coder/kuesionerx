@@ -246,7 +246,7 @@ export function QuestionnaireForm() {
               {answeredCount} dari {totalQuestions} pertanyaan terjawab
             </span>
             <span className="text-xs text-slate-500">
-              {Object.keys(answers).length}/48 jawaban
+              {Object.keys(answers).length}/40 jawaban
             </span>
           </div>
         </div>
