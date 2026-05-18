@@ -68,7 +68,7 @@ export function QuestionnaireForm() {
     },
   });
 
-  const totalQuestions = 48 + 3; // 48 questions + 3 respondent fields
+  const totalQuestions = 40 + 3; // 43 questions + 3 respondent fields
   const answeredCount = Object.keys(answers).length + (respondent.name ? 1 : 0) + (respondent.department ? 1 : 0) + (respondent.yearsWorked ? 1 : 0);
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
 
