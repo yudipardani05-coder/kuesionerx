@@ -67,3 +67,4 @@ export const questions: Question[] = [
 { num: 38, code: "Y", dimension: "Kemampuan Kerja Sama", indicator: "Partisipasi dalam Pencapaian Tujuan Tim", text: "Saya merasa/percaya/mengetahui bahwa saya aktif berpartisipasi dalam pencapaian tujuan tim." },
 { num: 39, code: "Y", dimension: "Tanggung Jawab", indicator: "Keandalan dalam Menyelesaikan Tugas", text: "Saya merasa/percaya/mengetahui bahwa saya dapat diandalkan dalam menyelesaikan setiap tugas yang diberikan." },
 { num: 40, code: "Y", dimension: "Tanggung Jawab", indicator: "Dedikasi dan Akuntabilitas Pekerjaan", text: "Saya merasa/percaya/mengetahui bahwa saya memiliki dedikasi tinggi dan bertanggung jawab penuh atas pekerjaan saya." },
+];
