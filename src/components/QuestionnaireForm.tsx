@@ -197,7 +197,7 @@ export function QuestionnaireForm() {
 </h1>
 <h2 className="text-lg font-bold text-slate-800 mb-6 max-w-2xl mx-auto leading-relaxed">
   PENGARUH SISTEM PENGGAJIAN DAN PENGENDALIAN INTERNAL
-  TERHADAP PERSPEKTIF AKUNTANSI MANAJEMEN
+  TERHADAP KINERJA KARYAWAN
   <br />
   <span className="font-semibold">(Studi Pada Pekerja Outsourcing di PT Geo Dipa Energi Unit Patuha 1 Bandung)</span>
 </h2>

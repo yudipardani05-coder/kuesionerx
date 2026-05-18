@@ -10,7 +10,7 @@ export const sections = [
   { id: "respondent", title: "Data Responden", description: "Mohon isi data diri Anda dengan lengkap" },
   { id: "x1", title: "Kelompok 1: Sistem Penggajian (X1)", description: "Pernyataan terkait sistem penggajian di perusahaan" },
   { id: "x2", title: "Kelompok 2: Pengendalian Internal (X2)", description: "Pernyataan terkait pengendalian internal perusahaan" },
-  { id: "y", title: "Kelompok 3: Perspektif Akuntansi Manajemen (Y)", description: "Pernyataan terkait perspektif akuntansi manajemen" },
+  { id: "y", title: "Kelompok 3: Kinerja Karyawan (Y)", description: "Pernyataan terkait Kinerja Karyawan" },
 ];
 
 export const scaleLabels = [
